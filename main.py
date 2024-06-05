@@ -143,8 +143,8 @@ def main():
 
    
     # file = 'very-small-test-dataset.txt'
-    # file = 'small-test-dataset-1.txt'
-    file = 'large-test-dataset-1.txt'
+    file = 'small-test-dataset-1.txt'
+    # file = 'large-test-dataset-1.txt'
 
     data = []
     
