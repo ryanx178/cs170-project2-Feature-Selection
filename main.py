@@ -4,6 +4,8 @@ count = 0 # for counting how many times euclideanDistance is called (Line 5,6)
 # AGENDA
 # still need to make backward selection
 # need to normalize
+# add the trace
+# extra: we can speed up by using a precomputed distance values for pairs of instances?
 
 def euclideanDistance(p1,p2):
     global count
