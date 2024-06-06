@@ -139,12 +139,68 @@ def forwardSelection(validator,classifier,data):
     print("Accuracy: ",bestAccuracy)
     
 
+def backwardSelection(validator,classifier,data):
+    featureAmount = len(data[0])-1
+    currentSet = set()
+    bestSet = set()
+    oldSet = set()
+    currAccuracy = 0
+    bestAccuracy = 0
+    #foundBetter = False
+
+    i = 0
+    while i <= featureAmount:
+        bestSet.add(i)
+        i += 1
+    
+    i -= 1
+    oldSet.add(0)
+    while len(bestSet) > 1:
+        if oldSet == bestSet:
+            break
+        oldSet = bestSet.copy()
+        i = list(bestSet)[-1]
+        while i >= 0:
+            currentSet = oldSet.copy()
+            test = i in currentSet
+            if test:
+                currentSet.remove(i)
+
+                listSet = sorted(list(currentSet))
+
+                currAccuracy = validator.leaveOneOut(listSet,classifier,data)
+
+                if bestAccuracy < currAccuracy:
+                    print("NEW BEST ",currentSet, " WITH ACCURACY ",currAccuracy)
+                    print("IS BETTER THAN")
+                    print("CURRENT ",bestSet, " WITH ACCURACY ",bestAccuracy)
+                    
+                    bestAccuracy = currAccuracy
+                    bestSet = currentSet.copy()
+                    #foundBetter = True
+                
+                elif bestAccuracy == currAccuracy and (len(currentSet) < len(bestSet)):
+                    bestSet = currentSet.copy()
+
+
+            i -= 1
+
+
+
 def main():
 
+    datac = int(input("Choose a datase: \n1) small test \n2) large test \n3) small data \n4) large data\n"))
    
-    # file = 'very-small-test-dataset.txt'
-    file = 'small-test-dataset-1.txt'
-    # file = 'large-test-dataset-1.txt'
+    if datac == 1:
+        file = 'small-test-dataset-1.txt'
+    elif datac == 2:
+        file = 'large-test-dataset-1.txt'
+    elif datac == 3:
+        file = 'CS170_Spring_2024_Small_data__35.txt'
+    else:
+        file = 'CS170_Spring_2024_Large_data__35.txt'
+
+    selectc = int(input("Choose feature selection method: \n1) Foward Selection \n2) Backwards Elimination\n"))
 
     data = []
     
@@ -160,8 +216,10 @@ def main():
     c = Classifier()
     v = Validator()
 
-    bestFeatures = forwardSelection(v,c,data)
-    # bestFeature = backwardSelection(v,c,data)
+    if selectc == 1:
+        bestFeatures = forwardSelection(v,c,data)
+    else:
+        bestFeatures = backwardSelection(v,c,data)
 
     print("BEST: ",bestFeatures)
 
