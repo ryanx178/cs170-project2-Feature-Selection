@@ -148,7 +148,7 @@ def backwardSelection(validator,classifier,data):
     bestAccuracy = 0
     #foundBetter = False
 
-    i = 0
+    i = 1
     while i <= featureAmount:
         bestSet.add(i)
         i += 1
@@ -160,7 +160,7 @@ def backwardSelection(validator,classifier,data):
             break
         oldSet = bestSet.copy()
         i = list(bestSet)[-1]
-        while i >= 0:
+        while i > 0:
             currentSet = oldSet.copy()
             test = i in currentSet
             if test:
