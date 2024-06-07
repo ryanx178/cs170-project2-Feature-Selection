@@ -159,12 +159,67 @@ def forwardSelection(validator,classifier,data):
     return bestSet
     
 
-def main():
+def backwardSelection(validator,classifier,data):
+    featureAmount = len(data[0])-1
+    currentSet = set()
+    bestSet = set()
+    oldSet = set()
+    currAccuracy = 0
+    bestAccuracy = 0
+    #foundBetter = False
 
+    i = 1
+    while i <= featureAmount:
+        bestSet.add(i)
+        i += 1
+    
+    i -= 1
+    oldSet.add(0)
+    while len(bestSet) > 1:
+        if oldSet == bestSet:
+            break
+        oldSet = bestSet.copy()
+        i = list(bestSet)[-1]
+        while i > 0:
+            currentSet = oldSet.copy()
+            test = i in currentSet
+            if test:
+                currentSet.remove(i)
+
+                listSet = sorted(list(currentSet))
+
+                currAccuracy = validator.leaveOneOut(listSet,classifier,data)
+
+                if bestAccuracy < currAccuracy:
+                    print("NEW BEST ",currentSet, " WITH ACCURACY ",currAccuracy)
+                    print("IS BETTER THAN")
+                    print("CURRENT ",bestSet, " WITH ACCURACY ",bestAccuracy)
+                    
+                    bestAccuracy = currAccuracy
+                    bestSet = currentSet.copy()
+                    #foundBetter = True
+                
+                elif bestAccuracy == currAccuracy and (len(currentSet) < len(bestSet)):
+                    bestSet = currentSet.copy()
+
+            i -= 1
+
+def main():
+    
+    print("Welcome to Group 35 Feature Selection Algorithm")
+    datac = int(input("Choose a file: \n1) small-test-dataset-1.txt \n2) large-test-dataset-1.txt \n3) CS170_Spring_2024_Small_data__35.txt \n4) CS170_Spring_2024_Large_data__35.txt\n"))
    
-    # file = 'very-small-test-dataset.txt'
-    # file = 'small-test-dataset-1.txt'
-    file = 'large-test-dataset-1.txt'
+    if datac == 1:
+        file = 'small-test-dataset-1.txt'
+    elif datac == 2:
+        file = 'large-test-dataset-1.txt'
+    elif datac == 3:
+        file = 'CS170_Spring_2024_Small_data__35.txt'
+    else:
+        file = 'CS170_Spring_2024_Large_data__35.txt'
+
+    selectc = int(input("Choose feature selection method: \n1) Forward Selection \n2) Backward Selection\n"))
+    
 
     data = []
     
@@ -176,16 +231,22 @@ def main():
             
             line = [float(x) for x in line]     # converts each number in line to a float
             data.append(line)
+            
+    print(f"This dataset has {len(data)-1} features with {len(data)} instances.")
+            
+    print("Normalizing the data...")
+    data = normalize(data)
+    print("Done!")
     
     c = Classifier()
     v = Validator()
 
-    print("Normalizing the data...")
-    data = normalize(data)
-    print("Done!")
-
-    bestFeatures = forwardSelection(v,c,data)
-    # bestFeatures = backwardSelection(v,c,data)
+    if selectc == 1:
+        print("Running forward selection using Leave-One-Out evaluation and nearest neighbor classifier")
+        bestFeatures = forwardSelection(v,c,data)
+    else:
+        print("Running backward selection using Leave-One-Out evaluation and nearest neighbor classifier")
+        bestFeatures = backwardSelection(v,c,data)
 
     print("BEST: ",bestFeatures)
 
