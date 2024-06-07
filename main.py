@@ -112,21 +112,18 @@ def forwardSelection(validator,classifier,data):
         listSet = sorted(list(currentSet))
 
         currAccuracy = validator.leaveOneOut(listSet,classifier,data)
+        # print(listSet,"=",currAccuracy)
 
         if bestAccuracy < currAccuracy:
             print("NEW BEST ",currentSet, " WITH ACCURACY ",currAccuracy)
             print("IS BETTER THAN")
             print("CURRENT ",bestSet, " WITH ACCURACY ",bestAccuracy)
 
-             
             bestAccuracy = currAccuracy
             bestSet = currentSet.copy()
             foundBetter = True
-                       
-        elif bestAccuracy == currAccuracy and (len(currentSet) < len(bestSet)):
-            bestSet = currentSet.copy()
 
-        # also check if equal and choose the one with less features
+        # This is the greedy approach. If adding all features 1-10 result in a worse accuracy then it will stop
         if foundBetter and i == featureAmount:
             currentSet = bestSet.copy()
             foundBetter = False
@@ -134,17 +131,18 @@ def forwardSelection(validator,classifier,data):
         else: 
             currentSet.remove(i)
         i += 1
-
+    print("All features have worse accuracy")
     print("Best: ",bestSet)
     print("Accuracy: ",bestAccuracy)
+    return bestSet
     
 
 def main():
 
    
     # file = 'very-small-test-dataset.txt'
-    file = 'small-test-dataset-1.txt'
-    # file = 'large-test-dataset-1.txt'
+    # file = 'small-test-dataset-1.txt'
+    file = 'large-test-dataset-1.txt'
 
     data = []
     
@@ -161,7 +159,7 @@ def main():
     v = Validator()
 
     bestFeatures = forwardSelection(v,c,data)
-    # bestFeature = backwardSelection(v,c,data)
+    # bestFeatures = backwardSelection(v,c,data)
 
     print("BEST: ",bestFeatures)
 
