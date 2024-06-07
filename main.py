@@ -1,5 +1,5 @@
 import math
-count = 0 # for counting how many times euclideanDistance is called (Line 5,6)
+# count = 0 # for counting how many times euclideanDistance is called (Line 5,6)
 
 # AGENDA
 # still need to make backward selection
@@ -8,8 +8,8 @@ count = 0 # for counting how many times euclideanDistance is called (Line 5,6)
 # extra: we can speed up by using a precomputed distance values for pairs of instances?
 
 def euclideanDistance(p1,p2):
-    global count
-    count += 1
+    # global count
+    # count += 1
 
     if len(p1) != len(p2):
         raise ValueError("Points are not the same dimensions")
@@ -21,6 +21,29 @@ def euclideanDistance(p1,p2):
     
     return math.sqrt(distance)
 
+def normalize(data):
+    numFeatures = len(data[0])-1
+    feature = 1
+    mean = [0] * (numFeatures+1) # the first element is unnecessary because its the type
+    stDev = [0] * (numFeatures+1)
+    # calculate mean
+    for i in range(0,len(data)):
+        for j in range(0,len(data[0])):
+            mean[j] += data[i][j]
+            if i == len(data)-1:
+                mean[j] /= len(data)
+    # calculate standard deviation
+    for i in range(0,len(data)):
+        for j in range(0,len(data[0])):
+            stDev[j] += ((data[i][j]-mean[j]) ** 2)
+            if i == len(data)-1:
+                stDev[j] = math.sqrt(stDev[j] / len(data))
+    # apply normalization to each entry in data
+    for i in range(0,len(data)):
+        for j in range(0,len(data[0])):
+            data[i][j] = (data[i][j] - mean[j]) / stDev[j]
+
+    return data
 
 class Classifier:
 
@@ -112,7 +135,7 @@ def forwardSelection(validator,classifier,data):
         listSet = sorted(list(currentSet))
 
         currAccuracy = validator.leaveOneOut(listSet,classifier,data)
-        # print(listSet,"=",currAccuracy)
+        print(listSet,"=",currAccuracy)
 
         if bestAccuracy < currAccuracy:
             print("NEW BEST ",currentSet, " WITH ACCURACY ",currAccuracy)
@@ -131,8 +154,7 @@ def forwardSelection(validator,classifier,data):
         else: 
             currentSet.remove(i)
         i += 1
-    print("All features have worse accuracy")
-    print("Best: ",bestSet)
+    print("All features have worse accuracy!")
     print("Accuracy: ",bestAccuracy)
     return bestSet
     
@@ -154,9 +176,13 @@ def main():
             
             line = [float(x) for x in line]     # converts each number in line to a float
             data.append(line)
-
+    
     c = Classifier()
     v = Validator()
+
+    print("Normalizing the data...")
+    data = normalize(data)
+    print("Done!")
 
     bestFeatures = forwardSelection(v,c,data)
     # bestFeatures = backwardSelection(v,c,data)
