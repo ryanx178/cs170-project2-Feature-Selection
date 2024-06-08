@@ -127,7 +127,7 @@ def forwardSelection(validator,classifier,data):
 
     i = 1
     while i <= featureAmount:
-        if i in currentSet:
+        if i in currentSet and not(i == featureAmount):
             i += 1
             continue
         currentSet.add(i)
@@ -138,15 +138,13 @@ def forwardSelection(validator,classifier,data):
         print(listSet,"=",currAccuracy)
 
         if bestAccuracy < currAccuracy:
-            print("NEW BEST ",currentSet, " WITH ACCURACY ",currAccuracy)
-            print("IS BETTER THAN")
-            print("CURRENT ",bestSet, " WITH ACCURACY ",bestAccuracy)
+            print("NEW BEST ",currentSet, "=",currAccuracy,"IS BETTER THAN CURRENT",bestSet, "=",bestAccuracy)
 
             bestAccuracy = currAccuracy
             bestSet = currentSet.copy()
             foundBetter = True
 
-        # This is the greedy approach. If adding all features 1-10 result in a worse accuracy then it will stop
+        # If adding all features 1-10 result in a worse accuracy then it will stop
         if foundBetter and i == featureAmount:
             currentSet = bestSet.copy()
             foundBetter = False
@@ -166,7 +164,6 @@ def backwardSelection(validator,classifier,data):
     oldSet = set()
     currAccuracy = 0
     bestAccuracy = 0
-    #foundBetter = False
 
     i = 1
     while i <= featureAmount:
@@ -189,20 +186,21 @@ def backwardSelection(validator,classifier,data):
                 listSet = sorted(list(currentSet))
 
                 currAccuracy = validator.leaveOneOut(listSet,classifier,data)
+                print(listSet,"=",currAccuracy)
 
                 if bestAccuracy < currAccuracy:
-                    print("NEW BEST ",currentSet, " WITH ACCURACY ",currAccuracy)
-                    print("IS BETTER THAN")
-                    print("CURRENT ",bestSet, " WITH ACCURACY ",bestAccuracy)
+                    print("NEW BEST ",currentSet, "=",currAccuracy,"BETTER THAN CURRENT",bestSet, " =",bestAccuracy)
                     
                     bestAccuracy = currAccuracy
                     bestSet = currentSet.copy()
-                    #foundBetter = True
                 
                 elif bestAccuracy == currAccuracy and (len(currentSet) < len(bestSet)):
                     bestSet = currentSet.copy()
 
             i -= 1
+    print("All features have worse accuracy!")
+    print("Accuracy: ",bestAccuracy)
+    return bestSet
 
 def main():
     
@@ -232,7 +230,7 @@ def main():
             line = [float(x) for x in line]     # converts each number in line to a float
             data.append(line)
             
-    print(f"This dataset has {len(data)-1} features with {len(data)} instances.")
+    print(f"This dataset has {len(data[0])-1} features with {len(data)} instances.")
             
     print("Normalizing the data...")
     data = normalize(data)
@@ -242,10 +240,10 @@ def main():
     v = Validator()
 
     if selectc == 1:
-        print("Running forward selection using Leave-One-Out evaluation and nearest neighbor classifier")
+        print("Running forward selection using Leave-One-Out evaluation and nearest neighbor classifier...")
         bestFeatures = forwardSelection(v,c,data)
     else:
-        print("Running backward selection using Leave-One-Out evaluation and nearest neighbor classifier")
+        print("Running backward selection using Leave-One-Out evaluation and nearest neighbor classifier...")
         bestFeatures = backwardSelection(v,c,data)
 
     print("BEST: ",bestFeatures)
