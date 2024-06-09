@@ -169,9 +169,11 @@ def backwardSelection(validator,classifier,data):
     while i <= featureAmount:
         bestSet.add(i)
         i += 1
-    
     i -= 1
     oldSet.add(0)
+
+    currAccuracy = validator.leaveOneOut(sorted(list(currentSet)),classifier,data)
+
     while len(bestSet) > 1:
         if oldSet == bestSet:
             break
