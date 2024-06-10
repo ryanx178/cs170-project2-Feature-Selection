@@ -151,30 +151,17 @@ def backwardSelection(validator, classifier, data):
     print("Accuracy: ", bestAccuracy)
     return bestSet
 
-# Evaluate individual features
-def evaluate_individual_features(data):
-    classifier = Classifier()
-    validator = Validator()
-    num_features = len(data[0]) - 1
-    accuracies = []
-    for i in range(1, num_features + 1):
-        accuracy = validator.leaveOneOut([i], classifier, data)
-        accuracies.append((i, accuracy))
-        print(f"Feature {i}: Accuracy = {accuracy:.4f}")
-    return accuracies
-
-# Main function
 def main():
     print("Welcome to Group 35 Feature Selection Algorithm")
     datac = int(input("Choose a file: \n1) small-test-dataset-1.txt \n2) large-test-dataset-1.txt \n3) CS170_Spring_2024_Small_data__35.txt \n4) CS170_Spring_2024_Large_data__35.txt\n"))
-   
+
     file_map = {
         1: 'small-test-dataset-1.txt',
         2: 'large-test-dataset-1.txt',
         3: 'CS170_Spring_2024_Small_data__35.txt',
         4: 'CS170_Spring_2024_Large_data__35.txt'
     }
-    
+
     file = file_map.get(datac, 'CS170_Spring_2024_Large_data__35.txt')
 
     data = []
@@ -185,33 +172,36 @@ def main():
                 break
             line = [float(x) for x in line]
             data.append(line)
-            
+
     print(f"This dataset has {len(data[0]) - 1} features with {len(data)} instances.")
-    print("Normalizing the data...")
-    data = normalize(data)
-    print("Done!")
-    
+
     c = Classifier()
     v = Validator()
 
     selectc = int(input("Choose feature selection method: \n1) Forward Selection \n2) Backward Selection\n"))
-    
+
+    # Run feature selection on unnormalized data
+    print("\nRunning feature selection on unnormalized data...")
     if selectc == 1:
-        print("Running forward selection using Leave-One-Out evaluation and nearest neighbor classifier...")
-        bestFeatures = forwardSelection(v, c, data)
+        bestFeaturesUnnormalized = forwardSelection(v, c, data)
     else:
-        print("Running backward selection using Leave-One-Out evaluation and nearest neighbor classifier...")
-        bestFeatures = backwardSelection(v, c, data)
+        bestFeaturesUnnormalized = backwardSelection(v, c, data)
 
-    print("BEST: ", bestFeatures)
-    
-    print("\nEvaluating individual features...\n")
-    accuracies = evaluate_individual_features(data)
-    best_feature = max(accuracies, key=lambda x: x[1])
-    worst_feature = min(accuracies, key=lambda x: x[1])
+    print("Best features for unnormalized data: ", bestFeaturesUnnormalized)
 
-    print(f"Best Feature: {best_feature[0]} with Accuracy = {best_feature[1]:.4f}")
-    print(f"Worst Feature: {worst_feature[0]} with Accuracy = {worst_feature[1]:.4f}")
+    # Normalize the data
+    print("\nNormalizing the data...")
+    normalized_data = normalize([row[:] for row in data])  # Deep copy the data to avoid modifying the original
+    print("Done!")
+
+    # Run feature selection on normalized data
+    print("\nRunning feature selection on normalized data...")
+    if selectc == 1:
+        bestFeaturesNormalized = forwardSelection(v, c, normalized_data)
+    else:
+        bestFeaturesNormalized = backwardSelection(v, c, normalized_data)
+
+    print("Best features for normalized data: ", bestFeaturesNormalized)
 
 if __name__ == "__main__":
     main()
